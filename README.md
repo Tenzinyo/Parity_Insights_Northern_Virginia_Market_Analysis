@@ -9,12 +9,13 @@
 
 ## Overview
 
-This repository contains a data-driven market analysis of Northern Virginia (NOVA) to support retail site selection and customer targeting decisions. The analysis is built on verified U.S. Census Bureau data and is structured in two phases:
+This repository contains a data-driven market analysis of Northern Virginia (NOVA) to support retail site selection and customer targeting decisions. The analysis is built on verified U.S. Census Bureau data and is structured in three phases:
 
 1. **County-level analysis** across all five NOVA jurisdictions using ACS 1-Year 2025 estimates
 2. **Census tract-level drill-down** into Fairfax County using ACS 5-Year 2024 estimates and geospatial shapefiles
+3. **Vienna deep-dive** — census tract-level income analysis by age and race for the top recommended site location
 
-The notebook `NOVA_market_analysis.ipynb` is the primary deliverable. It is designed to be reproducible and auditable, with all source data drawn directly from ACS public tables. All margin-of-error columns are excluded from analysis to keep the focus on point estimates.
+The notebook `NOVA_market_analysis.ipynb` is the primary deliverable for phases 1–2. `Vienna_analysis.ipynb` provides the phase 3 deep-dive. Both are designed to be reproducible and auditable, with all source data drawn directly from ACS public tables. All margin-of-error columns are excluded from analysis to keep the focus on point estimates.
 
 **Research Questions Addressed:**
 - What are the gender dynamics in NOVA?
@@ -28,7 +29,8 @@ The notebook `NOVA_market_analysis.ipynb` is the primary deliverable. It is desi
 
 ```
 Market Analysis/
-├── NOVA_market_analysis.ipynb              # Main analysis notebook
+├── NOVA_market_analysis.ipynb              # Main analysis notebook (phases 1–2)
+├── Vienna_analysis.ipynb                   # Vienna deep-dive notebook (phase 3)
 ├── README.md                               # This file
 ├── ACSST1Y2025.S0101-Data.csv             # County-level age & sex (ACS 1-Year 2025)
 ├── ACSST1Y2025.S1903-Data.csv             # County-level median household income (ACS 1-Year 2025)
@@ -129,6 +131,46 @@ With Fairfax identified as the primary target market, the analysis drills down t
 
 ---
 
+### 5. Vienna Deep-Dive — Census Tract Income Analysis
+
+With Vienna confirmed as the top site recommendation, `Vienna_analysis.ipynb` provides a granular income analysis of its 9 constituent census tracts using ACS 5-Year 2024 data.
+
+**Tracts analyzed:** 4917.06, 4917.07, 4921, 4922.01, 4922.02, 4922.03, 4923, 4924, 4925
+**Data:** `ACSST5Y2024.S1903` — Median Household Income by Age and Race of Householder
+**Boundaries:** Virginia TIGER/Line Places shapefile (2023) for Vienna town outline
+
+#### 5a. Income by Age of Householder — Choropleth Maps (3-Panel)
+
+- **Output:** Three side-by-side choropleth maps (YlOrRd scale) of Vienna census tracts showing median household income for householders aged 15–24, 25–44, and 45–64, with the Vienna town boundary overlaid in blue
+- **Key findings:**
+  - Ages 15–24 data is **77.8% suppressed** across Vienna tracts — too few households to yield reliable estimates
+  - Ages 25–44 and 45–64 show extreme affluence: multiple tracts hit the ACS survey cap of **$250,000+**, including tracts 4921, 4922.01, 4922.02, 4925
+  - Only tracts 4917.06 and 4917.07 return sub-cap values for all age groups, providing the clearest income signal
+
+#### 5b. Racial Household Income Comparison — Bar Chart
+
+- **Output:** Horizontal bar chart showing average of census tract median household incomes by racial group (White, Black, Asian, Other) across Vienna's 9 tracts
+- **Key findings:**
+
+| Racial Group | Average Median Household Income |
+|---|---|
+| **Black / African American** | $198,372 |
+| **White** | $196,949 |
+| **Asian** | $176,127 |
+| **Other** | $153,679 |
+
+  - Black and White householders show near-parity at the top, both close to $197K–$198K
+  - Asian householders average $176K — still highly affluent but ~$20K below the top two groups
+  - American Indian/Alaska Native and Native Hawaiian groups are **100% suppressed** in Vienna — populations too small for ACS reporting
+  - "Other race" households average $153,679, the lowest among reported groups
+
+#### 5c. Income Distribution Across All Fairfax Tracts — Boxplot
+
+- **Output:** Horizontal boxplot showing the full distribution of median household incomes across all 87 Fairfax census tracts, broken out by demographic group (age and race)
+- **Key finding:** Broad variance across the county confirms Vienna's tracts cluster at the high end of the Fairfax income distribution, reinforcing its premium positioning
+
+---
+
 ## Site Recommendation
 
 Based on the combined county-level and census tract analyses, **Fairfax County** is the confirmed primary market, with **Vienna** as the top candidate for a second location.
@@ -171,6 +213,7 @@ Loudoun County, while income-leading, is geographically dispersed and not ideal 
 | `ACSST5Y2024.S0802-Data.csv` | S0802 | Commute patterns | Tract (5-Year 2024) |
 | `Fairfax_County_Boundary.shp` | — | Fairfax County boundary shapefile | County (Esri, 2026) |
 | `tl_2024_51_tract.zip` | — | Virginia census tract boundaries | State/Tract (TIGER 2024) |
+| `tl_2023_51_place.zip` | — | Virginia places (cities/towns) shapefile — used for Vienna town boundary | State/Place (TIGER 2023) |
 
 All ACS data sourced from [data.census.gov](https://data.census.gov). Virginia TIGER/Line shapefile downloaded from the U.S. Census Bureau at runtime.
 
